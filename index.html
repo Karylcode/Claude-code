@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ProFlow — 智能工作流管理平台</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
+          colors: {
+            primary:   '#0D9488',
+            secondary: '#14B8A6',
+            cta:       '#F97316',
+            surface:   '#F0FDFA',
+            ink:       '#134E4A',
+          },
+          animation: {
+            'fade-up':   'fadeUp 0.6s ease both',
+            'fade-in':   'fadeIn 0.4s ease both',
+            'pulse-dot': 'pulseDot 1.4s ease-in-out infinite',
+          },
+          keyframes: {
+            fadeUp:   { from: { opacity: 0, transform: 'translateY(24px)' }, to: { opacity: 1, transform: 'translateY(0)' } },
+            fadeIn:   { from: { opacity: 0 }, to: { opacity: 1 } },
+            pulseDot: { '0%,100%': { opacity: 0.4, transform: 'scale(1)' }, '50%': { opacity: 1, transform: 'scale(1.2)' } },
+          },
+        },
+      },
+    }
+  </script>
+
+  <style>
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+
+    .glass { background: rgba(255,255,255,0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(13,148,136,0.12); }
+
+    .bento-card { transition: transform 200ms ease, box-shadow 200ms ease; }
+    .bento-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -8px rgba(13,148,136,0.18); }
+
+    .btn-cta { transition: background 150ms ease, transform 150ms ease, box-shadow 150ms ease; }
+    .btn-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px -4px rgba(249,115,22,0.4); }
+    .btn-cta:active { transform: translateY(0); }
+
+    .nav-link { transition: color 150ms ease; }
+
+    .skeleton { background: linear-gradient(90deg, #e0f2f1 25%, #b2dfdb 50%, #e0f2f1 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+    @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+    .feature-icon { transition: background 150ms ease; }
+    .bento-card:hover .feature-icon { background: #0D9488; }
+    .bento-card:hover .feature-icon svg { color: white; }
+
+    html { scroll-behavior: smooth; }
+  </style>
+</head>
+<body class="bg-surface text-ink font-sans antialiased">
+
+  <!-- ===================== NAVBAR ===================== -->
+  <header class="fixed top-4 left-4 right-4 z-50" role="banner">
+    <nav class="glass max-w-6xl mx-auto rounded-2xl px-6 py-3 flex items-center justify-between" aria-label="主導覽">
+      <!-- Logo -->
+      <a href="#" class="flex items-center gap-2 group" aria-label="ProFlow 首頁">
+        <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center flex-shrink-0">
+          <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <span class="font-bold text-lg text-ink">ProFlow</span>
+      </a>
+
+      <!-- Desktop Links -->
+      <ul class="hidden md:flex items-center gap-6 text-sm font-medium text-ink/70" role="list">
+        <li><a href="#features" class="nav-link hover:text-primary cursor-pointer">功能</a></li>
+        <li><a href="#how-it-works" class="nav-link hover:text-primary cursor-pointer">流程</a></li>
+        <li><a href="#pricing" class="nav-link hover:text-primary cursor-pointer">定價</a></li>
+      </ul>
+
+      <!-- CTA Buttons -->
+      <div class="flex items-center gap-3">
+        <a href="#" class="hidden md:inline text-sm font-medium text-ink/70 nav-link hover:text-primary cursor-pointer">登入</a>
+        <a href="#pricing" class="btn-cta bg-cta text-white text-sm font-semibold px-5 py-2.5 rounded-xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-cta focus:ring-offset-2">
+          免費開始
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ===================== HERO ===================== -->
+    <section class="min-h-screen flex flex-col items-center justify-center px-4 pt-32 pb-20 text-center" aria-labelledby="hero-heading">
+      <!-- Badge -->
+      <div class="inline-flex items-center gap-2 bg-secondary/10 border border-secondary/20 text-primary text-xs font-semibold px-4 py-1.5 rounded-full mb-6 animate-fade-in">
+        <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse-dot" aria-hidden="true"></span>
+        v2.0 正式上線 — AI 智能工作流
+      </div>
+
+      <!-- Heading -->
+      <h1 id="hero-heading" class="text-4xl sm:text-5xl md:text-6xl font-extrabold text-ink max-w-3xl leading-tight animate-fade-up" style="animation-delay:0.1s">
+        讓團隊協作快<br />
+        <span class="text-primary">10 倍</span>的工作平台
+      </h1>
+
+      <p class="mt-6 text-lg text-ink/60 max-w-xl leading-relaxed animate-fade-up" style="animation-delay:0.2s">
+        ProFlow 整合 AI 自動化、即時協作與智能分析，幫助你的團隊消除繁瑣流程，聚焦真正重要的事。
+      </p>
+
+      <!-- CTAs -->
+      <div class="mt-10 flex flex-col sm:flex-row items-center gap-4 animate-fade-up" style="animation-delay:0.3s">
+        <a href="#pricing" class="btn-cta bg-cta text-white font-semibold px-8 py-3.5 rounded-xl text-base cursor-pointer focus:outline-none focus:ring-2 focus:ring-cta focus:ring-offset-2">
+          免費試用 14 天
+        </a>
+        <a href="#how-it-works" class="flex items-center gap-2 text-ink/70 font-medium hover:text-primary nav-link cursor-pointer">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          觀看示範影片
+        </a>
+      </div>
+
+      <!-- Social Proof -->
+      <p class="mt-8 text-xs text-ink/40 animate-fade-up" style="animation-delay:0.4s">
+        已有 <strong class="text-ink/60">12,000+</strong> 個團隊使用 · 無需信用卡
+      </p>
+
+      <!-- Dashboard Preview -->
+      <div class="mt-16 w-full max-w-4xl mx-auto animate-fade-up" style="animation-delay:0.5s" aria-label="產品截圖預覽">
+        <div class="glass rounded-2xl p-4 shadow-2xl shadow-primary/10">
+          <!-- Fake Browser Bar -->
+          <div class="flex items-center gap-2 mb-4 px-2">
+            <div class="w-3 h-3 rounded-full bg-red-400" aria-hidden="true"></div>
+            <div class="w-3 h-3 rounded-full bg-yellow-400" aria-hidden="true"></div>
+            <div class="w-3 h-3 rounded-full bg-green-400" aria-hidden="true"></div>
+            <div class="flex-1 bg-primary/5 rounded-md h-6 ml-2 flex items-center px-3">
+              <span class="text-xs text-ink/40">app.proflow.cc/dashboard</span>
+            </div>
+          </div>
+
+          <!-- Dashboard Content -->
+          <div class="bg-white/60 rounded-xl p-6 grid grid-cols-3 gap-4">
+            <!-- Stat Cards -->
+            <div class="bg-primary/5 rounded-xl p-4 col-span-3 sm:col-span-1">
+              <p class="text-xs text-ink/50 font-medium">本週完成任務</p>
+              <p class="text-2xl font-bold text-primary mt-1">142</p>
+              <p class="text-xs text-green-600 mt-1">↑ 23% vs 上週</p>
+            </div>
+            <div class="bg-cta/5 rounded-xl p-4 col-span-3 sm:col-span-1">
+              <p class="text-xs text-ink/50 font-medium">進行中</p>
+              <p class="text-2xl font-bold text-cta mt-1">38</p>
+              <p class="text-xs text-ink/40 mt-1">5 個成員協作中</p>
+            </div>
+            <div class="bg-secondary/10 rounded-xl p-4 col-span-3 sm:col-span-1">
+              <p class="text-xs text-ink/50 font-medium">AI 節省時數</p>
+              <p class="text-2xl font-bold text-secondary mt-1">14h</p>
+              <p class="text-xs text-ink/40 mt-1">本週自動化效益</p>
+            </div>
+
+            <!-- Skeleton Tasks -->
+            <div class="col-span-3 mt-2 space-y-2">
+              <div class="flex items-center gap-3 p-3 bg-white/80 rounded-lg border border-gray-100">
+                <div class="w-4 h-4 rounded border-2 border-primary flex-shrink-0" aria-hidden="true"></div>
+                <div class="flex-1 h-3 skeleton rounded"></div>
+                <div class="w-16 h-3 skeleton rounded"></div>
+              </div>
+              <div class="flex items-center gap-3 p-3 bg-white/80 rounded-lg border border-gray-100">
+                <div class="w-4 h-4 rounded border-2 border-gray-200 flex-shrink-0 bg-primary" aria-hidden="true"></div>
+                <div class="flex-1 h-3 skeleton rounded opacity-60"></div>
+                <div class="w-20 h-3 skeleton rounded opacity-60"></div>
+              </div>
+              <div class="flex items-center gap-3 p-3 bg-white/80 rounded-lg border border-gray-100">
+                <div class="w-4 h-4 rounded border-2 border-gray-200 flex-shrink-0" aria-hidden="true"></div>
+                <div class="flex-1 h-3 skeleton rounded opacity-40"></div>
+                <div class="w-12 h-3 skeleton rounded opacity-40"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== FEATURES (BENTO GRID) ===================== -->
+    <section id="features" class="py-24 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto" aria-labelledby="features-heading">
+      <div class="text-center mb-14">
+        <p class="text-primary font-semibold text-sm uppercase tracking-wider mb-3">核心功能</p>
+        <h2 id="features-heading" class="text-3xl sm:text-4xl font-extrabold text-ink">專為高效團隊設計</h2>
+        <p class="mt-4 text-ink/60 max-w-lg mx-auto">整合你工作中需要的一切，從規劃到交付，全程流暢。</p>
+      </div>
+
+      <!-- Bento Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+
+        <!-- Card 1: AI 自動化 (Large) -->
+        <article class="bento-card glass rounded-2xl p-6 lg:col-span-2 cursor-pointer" aria-label="AI 智能自動化功能">
+          <div class="feature-icon w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
+            <svg class="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-ink mb-2">AI 智能自動化</h3>
+          <p class="text-ink/60 text-sm leading-relaxed">
+            自動分派任務、生成報告、識別瓶頸。ProFlow AI 學習你的工作模式，主動優化流程，每週平均節省 14 小時。
+          </p>
+          <div class="mt-5 flex flex-wrap gap-2">
+            <span class="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-medium">自動分派</span>
+            <span class="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-medium">智能摘要</span>
+            <span class="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full font-medium">瓶頸偵測</span>
+          </div>
+        </article>
+
+        <!-- Card 2: 即時協作 -->
+        <article class="bento-card glass rounded-2xl p-6 cursor-pointer" aria-label="即時協作功能">
+          <div class="feature-icon w-11 h-11 rounded-xl bg-secondary/10 flex items-center justify-center mb-5">
+            <svg class="w-6 h-6 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-ink mb-2">即時協作</h3>
+          <p class="text-ink/60 text-sm leading-relaxed">
+            多人同時編輯、即時留言、@提及通知，讓遠端團隊像在同一辦公室工作。
+          </p>
+        </article>
+
+        <!-- Card 3: 進度追蹤 -->
+        <article class="bento-card glass rounded-2xl p-6 cursor-pointer" aria-label="進度追蹤功能">
+          <div class="feature-icon w-11 h-11 rounded-xl bg-cta/10 flex items-center justify-center mb-5">
+            <svg class="w-6 h-6 text-cta" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-ink mb-2">視覺化進度</h3>
+          <p class="text-ink/60 text-sm leading-relaxed">
+            甘特圖、看板、時間軸三種視角切換，隨時掌握專案全貌與個人工作量。
+          </p>
+        </article>
+
+        <!-- Card 4: 整合 -->
+        <article class="bento-card glass rounded-2xl p-6 cursor-pointer" aria-label="整合工具功能">
+          <div class="feature-icon w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
+            <svg class="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-ink mb-2">50+ 工具整合</h3>
+          <p class="text-ink/60 text-sm leading-relaxed">
+            Slack、GitHub、Figma、Notion 一鍵串接，資訊不再孤立分散。
+          </p>
+        </article>
+
+        <!-- Card 5: 安全性 (Large) -->
+        <article class="bento-card glass rounded-2xl p-6 lg:col-span-2 cursor-pointer" aria-label="企業級安全性功能">
+          <div class="flex flex-col sm:flex-row sm:items-start gap-5">
+            <div class="feature-icon w-11 h-11 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
+              <svg class="w-6 h-6 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-ink mb-2">企業級安全</h3>
+              <p class="text-ink/60 text-sm leading-relaxed">
+                SOC 2 Type II 認證、端對端加密、單一登入 (SSO)、角色權限管理。你的資料完全在你掌控之中，符合 GDPR 規範。
+              </p>
+              <div class="mt-4 flex flex-wrap gap-3">
+                <span class="text-xs bg-green-50 text-green-700 border border-green-200 px-3 py-1 rounded-full font-medium">SOC 2</span>
+                <span class="text-xs bg-green-50 text-green-700 border border-green-200 px-3 py-1 rounded-full font-medium">GDPR</span>
+                <span class="text-xs bg-green-50 text-green-700 border border-green-200 px-3 py-1 rounded-full font-medium">E2E 加密</span>
+                <span class="text-xs bg-green-50 text-green-700 border border-green-200 px-3 py-1 rounded-full font-medium">SSO</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ===================== HOW IT WORKS ===================== -->
+    <section id="how-it-works" class="py-24 bg-white/50 px-4 sm:px-6 lg:px-8" aria-labelledby="how-heading">
+      <div class="max-w-6xl mx-auto">
+        <div class="text-center mb-14">
+          <p class="text-primary font-semibold text-sm uppercase tracking-wider mb-3">使用流程</p>
+          <h2 id="how-heading" class="text-3xl sm:text-4xl font-extrabold text-ink">三步驟，立即上手</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <!-- Step 1 -->
+          <div class="text-center">
+            <div class="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-5">
+              <span class="text-xl font-extrabold text-primary">1</span>
+            </div>
+            <h3 class="font-bold text-ink text-lg mb-2">建立工作區</h3>
+            <p class="text-ink/60 text-sm leading-relaxed">邀請團隊成員，設定專案架構，匯入現有資料。5 分鐘即可完成。</p>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="text-center">
+            <div class="w-14 h-14 rounded-2xl bg-secondary/10 flex items-center justify-center mx-auto mb-5">
+              <span class="text-xl font-extrabold text-secondary">2</span>
+            </div>
+            <h3 class="font-bold text-ink text-lg mb-2">啟動 AI 助手</h3>
+            <p class="text-ink/60 text-sm leading-relaxed">AI 自動分析你的工作模式，建立個人化的自動化規則與提醒。</p>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="text-center">
+            <div class="w-14 h-14 rounded-2xl bg-cta/10 flex items-center justify-center mx-auto mb-5">
+              <span class="text-xl font-extrabold text-cta">3</span>
+            </div>
+            <h3 class="font-bold text-ink text-lg mb-2">持續優化</h3>
+            <p class="text-ink/60 text-sm leading-relaxed">透過週報與 AI 建議，不斷提升團隊效率，數據一目了然。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== PRICING ===================== -->
+    <section id="pricing" class="py-24 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto" aria-labelledby="pricing-heading">
+      <div class="text-center mb-14">
+        <p class="text-primary font-semibold text-sm uppercase tracking-wider mb-3">定價方案</p>
+        <h2 id="pricing-heading" class="text-3xl sm:text-4xl font-extrabold text-ink">按需選擇，隨時升級</h2>
+        <p class="mt-4 text-ink/60">所有方案均含 14 天免費試用，無需信用卡。</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <!-- Starter -->
+        <article class="glass rounded-2xl p-7 border border-primary/10" aria-label="Starter 方案">
+          <h3 class="font-bold text-ink text-lg mb-1">Starter</h3>
+          <p class="text-ink/50 text-sm mb-5">個人專案起步</p>
+          <div class="flex items-baseline gap-1 mb-6">
+            <span class="text-4xl font-extrabold text-ink">$9</span>
+            <span class="text-ink/50 text-sm">/月</span>
+          </div>
+          <ul class="space-y-3 mb-8 text-sm text-ink/70" role="list">
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              最多 3 個成員
+            </li>
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              5 個專案
+            </li>
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              基本 AI 功能
+            </li>
+          </ul>
+          <a href="#" class="block text-center py-3 px-6 rounded-xl border-2 border-primary text-primary font-semibold nav-link hover:bg-primary hover:text-white transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+            免費試用
+          </a>
+        </article>
+
+        <!-- Pro (Featured) -->
+        <article class="rounded-2xl p-7 bg-primary text-white shadow-2xl shadow-primary/30 relative" aria-label="Pro 方案（推薦）">
+          <div class="absolute -top-3.5 left-1/2 -translate-x-1/2">
+            <span class="bg-cta text-white text-xs font-bold px-4 py-1 rounded-full">最受歡迎</span>
+          </div>
+          <h3 class="font-bold text-white text-lg mb-1">Pro</h3>
+          <p class="text-white/60 text-sm mb-5">成長中的團隊</p>
+          <div class="flex items-baseline gap-1 mb-6">
+            <span class="text-4xl font-extrabold text-white">$29</span>
+            <span class="text-white/60 text-sm">/月</span>
+          </div>
+          <ul class="space-y-3 mb-8 text-sm text-white/80" role="list">
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-white flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              最多 15 個成員
+            </li>
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-white flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              無限專案
+            </li>
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-white flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              完整 AI 自動化
+            </li>
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-white flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              進階分析報表
+            </li>
+          </ul>
+          <a href="#" class="btn-cta block text-center py-3 px-6 rounded-xl bg-cta text-white font-semibold cursor-pointer focus:outline-none focus:ring-2 focus:ring-cta focus:ring-offset-2">
+            立即開始
+          </a>
+        </article>
+
+        <!-- Enterprise -->
+        <article class="glass rounded-2xl p-7 border border-primary/10" aria-label="Enterprise 方案">
+          <h3 class="font-bold text-ink text-lg mb-1">Enterprise</h3>
+          <p class="text-ink/50 text-sm mb-5">大型企業團隊</p>
+          <div class="flex items-baseline gap-1 mb-6">
+            <span class="text-4xl font-extrabold text-ink">聯絡</span>
+            <span class="text-ink/50 text-sm">我們</span>
+          </div>
+          <ul class="space-y-3 mb-8 text-sm text-ink/70" role="list">
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              無限成員
+            </li>
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              SSO / SAML
+            </li>
+            <li class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              專屬客服經理
+            </li>
+          </ul>
+          <a href="#" class="block text-center py-3 px-6 rounded-xl border-2 border-primary text-primary font-semibold nav-link hover:bg-primary hover:text-white transition-colors duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+            聯絡業務
+          </a>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ===================== CTA BANNER ===================== -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8" aria-labelledby="cta-heading">
+      <div class="max-w-3xl mx-auto text-center glass rounded-3xl p-12">
+        <h2 id="cta-heading" class="text-3xl sm:text-4xl font-extrabold text-ink mb-4">
+          準備好讓團隊起飛了嗎？
+        </h2>
+        <p class="text-ink/60 mb-8">立即免費試用，14 天內隨時取消，無需任何承諾。</p>
+        <a href="#pricing" class="btn-cta inline-block bg-cta text-white font-semibold px-10 py-4 rounded-xl text-base cursor-pointer focus:outline-none focus:ring-2 focus:ring-cta focus:ring-offset-2">
+          免費試用 14 天 →
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="py-12 px-4 sm:px-6 lg:px-8 border-t border-primary/10" role="contentinfo">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+      <div class="flex items-center gap-2">
+        <div class="w-7 h-7 rounded-lg bg-primary flex items-center justify-center" aria-hidden="true">
+          <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <span class="font-bold text-ink">ProFlow</span>
+        <span class="text-ink/40 text-sm ml-2">© 2026</span>
+      </div>
+
+      <nav aria-label="頁尾導覽">
+        <ul class="flex flex-wrap items-center gap-6 text-sm text-ink/50" role="list">
+          <li><a href="#" class="nav-link hover:text-primary cursor-pointer">隱私政策</a></li>
+          <li><a href="#" class="nav-link hover:text-primary cursor-pointer">服務條款</a></li>
+          <li><a href="#" class="nav-link hover:text-primary cursor-pointer">聯絡我們</a></li>
+        </ul>
+      </nav>
+
+      <p class="text-xs text-ink/30">Built with UI/UX Pro Max Skill</p>
+    </div>
+  </footer>
+
+</body>
+</html>
